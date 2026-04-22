@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CatTI - 猫咪人格测试 🐱</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: "🐾";
+            position: fixed;
+            top: 10%;
+            left: 5%;
+            font-size: 40px;
+            opacity: 0.15;
+            transform: rotate(-20deg);
+        }
+        body::after {
+            content: "🐾";
+            position: fixed;
+            bottom: 15%;
+            right: 8%;
+            font-size: 50px;
+            opacity: 0.15;
+            transform: rotate(30deg);
+        }
+        
+        .bg-paw {
+            position: fixed;
+            font-size: 35px;
+            opacity: 0.12;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .logo {
+            font-size: 64px;
+            margin-bottom: 10px;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        h1 {
+            font-size: 48px;
+            color: #ff6b6b;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #feca57);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .question-page-decor {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        
+        .cat-face {
+            animation: wiggle 1.5s infinite;
+        }
+        
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+        
+        .question {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #fff5f5 0%, #fff9e6 100%);
+            padding: 25px;
+            border-radius: 16px;
+            border-left: 4px solid #ff6b6b;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .option {
+            padding: 20px;
+            border: 2px solid #eee;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 16px;
+            text-align: left;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option::before {
+            content: "🐱";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .option:hover {
+            border-color: #ff6b6b;
+            background: #fff5f5;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.2);
+        }
+        
+        .option:hover::before {
+            opacity: 0.5;
+        }
+        
+        .option.selected {
+            border-color: #ff6b6b;
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        .option.selected::before {
+            content: "✓";
+            opacity: 1;
+        }
+        
+        .start-btn, .restart-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-weight: 600;
+        }
+        
+        .start-btn:hover, .restart-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+        }
+        
+        .result-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 4px solid #ff6b6b;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+            background: #f0f0f0;
+        }
+        
+        .result-name {
+            font-size: 32px;
+            color: #ff6b6b;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        
+        .result-subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .result-desc {
+            text-align: left;
+            background: #f8f8f8;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+            color: #555;
+        }
+        
+        .traits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .trait {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .dimension-scores {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        
+        .dimension {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 12px;
+        }
+        
+        .dimension-label {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+        
+        .dimension-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ff6b6b;
+        }
+        
+        .share-tip {
+            color: #999;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+        
+        .all-types-section {
+            margin-top: 50px;
+            padding-top: 40px;
+            border-top: 2px dashed #eee;
+        }
+        
+        .all-types-title {
+            font-size: 24px;
+            color: #ff6b6b;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+        
+        .all-types-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            text-align: left;
+        }
+        
+        .type-card {
+            background: #f8f8f8;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            transition: transform 0.2s ease;
+        }
+        
+        .type-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .type-card.is-user {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border: 2px solid #ff6b6b;
+        }
+        
+        .type-card-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: #e0e0e0;
+        }
+        
+        .type-card-content {
+            flex: 1;
+        }
+        
+        .type-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .type-card-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .type-card-subtitle {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+        
+        .type-card-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.7;
+        }
+        
+        .your-result-badge {
+            display: inline-block;
+            background: #ff6b6b;
+            color: white;
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 10px;
+            margin-left: 8px;
+        }
+        
+        @media (max-width: 500px) {
+            .dimension-scores {
+                grid-template-columns: 1fr;
+            }
+            .type-card {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .type-card-content {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-paw" style="top: 25%; left: 15%;">🐾</div>
+    <div class="bg-paw" style="top: 40%; right: 10%;">🐾</div>
+    <div class="bg-paw" style="top: 60%; left: 8%;">🐾</div>
+    <div class="bg-paw" style="top: 75%; right: 15%;">🐾</div>
+    <div class="bg-paw" style="top: 85%; left: 20%;">🐾</div>
+    
+    <div class="container">
+        <div id="start-page" class="page active">
+            <div class="logo">🐱</div>
+            <h1>CatTI</h1>
+            <p class="subtitle">猫咪人格测试 · 发现你的内在猫格</p>
+            <p style="color: #666; margin-bottom: 30px; line-height: 1.8;">
+                每个人心里都住着一只猫<br>
+                通过 12 道题目，探索你的猫咪人格类型<br>
+                你是高冷的布偶？还是粘人的橘猫？
+            </p>
+            <button class="start-btn" onclick="startTest()">开始测试 🐾</button>
+        </div>
+        
+        <div id="question-page" class="page">
+            <div class="question-page-decor">
+                <span class="cat-face">😺</span>
+                <span class="cat-face" style="animation-delay: 0.3s;">😸</span>
+                <span class="cat-face" style="animation-delay: 0.6s;">😻</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <p style="color: #999; margin-bottom: 10px;" id="question-num">问题 1/12</p>
+            <div class="question" id="question-text"></div>
+            <div class="options" id="options"></div>
+        </div>
+        
+        <div id="result-page" class="page">
+            <img class="result-image" id="result-image" src="" alt="">
+            <div class="result-name" id="result-name"></div>
+            <div class="result-subtitle" id="result-subtitle"></div>
+            <div class="traits" id="traits"></div>
+            <div class="result-desc" id="result-desc"></div>
+            <div class="dimension-scores" id="dimension-scores"></div>
+            <button class="restart-btn" onclick="restart()">再测一次 🔄</button>
+            <p class="share-tip">截图分享给你的猫友吧~</p>
+            
+            <div class="all-types-section">
+                <div class="all-types-title">🐱 全部 16 种猫咪人格</div>
+                <div class="all-types-grid" id="all-types-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                text: "当你进入一个新环境，你会？",
+                options: [
+                    { text: "主动探索每个角落，标记领地", scores: { E: 2, S: 1, P: 1 } },
+                    { text: "先躲在角落观察，确认安全再出来", scores: { I: 2, N: 1, J: 1 } },
+                    { text: "直接找最舒服的地方躺下", scores: { I: 1, S: 1, P: 2 } },
+                    { text: "四处游荡，寻找有趣的互动", scores: { E: 2, N: 1, F: 1 } }
+                ]
+            },
+            {
+                text: "面对逗猫棒，你的反应是？",
+                options: [
+                    { text: "立刻扑上去，享受狩猎的快感", scores: { E: 1, S: 2, P: 2 } },
+                    { text: "静静观察它的运动轨迹，等待最佳时机", scores: { I: 1, N: 2, J: 2 } },
+                    { text: "假装不在意，突然发动攻击", scores: { I: 1, N: 1, T: 2, P: 1 } },
+                    { text: "热情地追逐，邀请主人一起玩", scores: { E: 2, S: 1, F: 2, P: 1 } }
+                ]
+            },
+            {
+                text: "主人回家时，你通常会？",
+                options: [
+                    { text: "立刻跑到门口迎接，蹭腿撒娇", scores: { E: 2, F: 2, S: 1 } },
+                    { text: "继续睡觉，假装没听见", scores: { I: 2, T: 1, N: 1 } },
+                    { text: "远远地看着，确认是他再决定要不要理", scores: { I: 1, T: 2, J: 1 } },
+                    { text: "发出独特的叫声，告诉他今天发生了什么", scores: { E: 1, F: 2, N: 2, P: 1 } }
+                ]
+            },
+            {
+                text: "看到新玩具，你的第一反应？",
+                options: [
+                    { text: "马上研究怎么玩，拆解它的构造", scores: { S: 2, T: 2, P: 1 } },
+                    { text: "想象它的各种玩法，创造新花样", scores: { N: 2, F: 1, J: 1 } },
+                    { text: "先观察主人怎么演示，再模仿学习", scores: { S: 1, F: 2, J: 2 } },
+                    { text: "立刻扑上去，边玩边探索", scores: { E: 1, S: 1, P: 2, F: 1 } }
+                ]
+            },
+            {
+                text: "被主人抱住时，你的感受是？",
+                options: [
+                    { text: "享受温暖，发出呼噜声", scores: { F: 2, E: 1, S: 1 } },
+                    { text: "评估是否值得忍受，计算得失", scores: { T: 2, I: 1, N: 1 } },
+                    { text: "配合一下，但随时准备挣脱", scores: { T: 1, P: 2, I: 1 } },
+                    { text: "完全放松，把信任交给主人", scores: { F: 2, J: 1, E: 1 } }
+                ]
+            },
+            {
+                text: "饭盆空了，你会？",
+                options: [
+                    { text: "立刻大声喵喵叫，直到填满", scores: { E: 2, J: 1, F: 2 } },
+                    { text: "用眼神暗示，或默默等待时机", scores: { I: 2, P: 1, T: 2 } },
+                    { text: "把饭盆叼到主人面前", scores: { E: 1, J: 2, S: 2, T: 1 } },
+                    { text: "自己找点别的吃的，或者先睡一觉", scores: { I: 1, P: 2, N: 1, T: 1 } }
+                ]
+            },
+            {
+                text: "面对陌生猫咪，你的态度？",
+                options: [
+                    { text: "友好地打招呼，可能成为朋友", scores: { E: 2, F: 2, S: 1 } },
+                    { text: "保持距离，观察它是否构成威胁", scores: { I: 2, T: 2, N: 1 } },
+                    { text: "展示自己的领地，宣示主权", scores: { E: 1, T: 1, J: 2, S: 1 } },
+                    { text: "视情况而定，有时好奇有时警惕", scores: { N: 2, P: 2, I: 1 } }
+                ]
+            },
+            {
+                text: "你更喜欢什么样的休息方式？",
+                options: [
+                    { text: "在阳光下的窗台，观察外面的世界", scores: { S: 2, E: 1, P: 1 } },
+                    { text: "躲在纸箱里，享受独处的安宁", scores: { N: 2, I: 2, J: 1 } },
+                    { text: "趴在主人腿上，边睡边感受陪伴", scores: { F: 2, E: 1, S: 1 } },
+                    { text: "找个高处，既能观察又能独处", scores: { I: 1, N: 1, T: 1, J: 1 } }
+                ]
+            },
+            {
+                text: "主人工作时不理你，你会？",
+                options: [
+                    { text: "直接坐在键盘上，强制获得关注", scores: { E: 2, F: 1, P: 2 } },
+                    { text: "理解他在忙，自己找点事做", scores: { I: 1, T: 2, J: 2 } },
+                    { text: "在旁边静静陪伴，偶尔蹭蹭他", scores: { I: 1, F: 2, J: 1, N: 1 } },
+                    { text: "制造点小动静，测试他的反应", scores: { E: 1, T: 1, P: 2, N: 1 } }
+                ]
+            },
+            {
+                text: "关于作息时间，你？",
+                options: [
+                    { text: "随心所欲，想睡就睡想玩就玩", scores: { P: 2, S: 1, E: 1 } },
+                    { text: "有固定的作息规律，准时吃饭睡觉", scores: { J: 2, N: 1, I: 1 } },
+                    { text: "跟随主人的节奏，他醒我也醒", scores: { F: 2, J: 1, E: 1, S: 1 } },
+                    { text: "白天睡觉，深夜开始跑酷", scores: { P: 2, N: 2, I: 1 } }
+                ]
+            },
+            {
+                text: "遇到困难（比如够不到高处），你会？",
+                options: [
+                    { text: "反复尝试不同方法，直到成功", scores: { T: 1, P: 2, S: 2 } },
+                    { text: "喵喵叫求助，相信主人会帮忙", scores: { F: 2, J: 1, E: 2 } },
+                    { text: "放弃这个目标，找别的乐子", scores: { P: 2, N: 1, I: 1 } },
+                    { text: "仔细分析环境，找到最优路径", scores: { T: 2, N: 2, J: 1 } }
+                ]
+            },
+            {
+                text: "如果可以许一个愿望，你会选择？",
+                options: [
+                    { text: "永远吃不完的高级罐头", scores: { S: 2, T: 1, J: 1 } },
+                    { text: "能听懂主人说的每一句话", scores: { N: 2, F: 2, E: 1 } },
+                    { text: "一个永远玩不腻的游乐园", scores: { S: 1, P: 2, E: 2 } },
+                    { text: "一个只有我知道的秘密基地", scores: { N: 2, I: 2, J: 1 } }
+                ]
+            }
+        ];
+
+        // 16种真实猫咪品种 - 使用 The Cat API 的真实图片
+        const results = {
+            "ESTJ": {
+                name: "缅因猫",
+                subtitle: "温柔的巨人格",
+                image: "https://cdn2.thecatapi.com/images/15l.jpg",
+                desc: "你是猫界的巨人！体型庞大却性格温和，既有威严又不失温柔。你天生具有领导气质，在家里是当之无愧的老大。你聪明、自信、有主见，喜欢掌控全局，但从不滥用权威。主人常说：你是家里最可靠的存在，有你在就感到安心。",
+                traits: ["威严", "可靠", "温和", "有领导力", "聪明"]
+            },
+            "ESTP": {
+                name: "孟加拉豹猫",
+                subtitle: "野性的冒险家",
+                image: "https://cdn2.thecatapi.com/images/8hh.jpg",
+                desc: "你是一只披着家猫皮的小豹子！精力充沛、运动天赋爆表，家里没有你跳不上去的地方。你渴望冒险和刺激，喜欢追逐、狩猎、探索未知。你的野性魅力让人着迷，但主人得时刻盯着你——因为你随时可能搞出新花样。",
+                traits: ["活力四射", "运动健将", "冒险家", "野性魅力", "好奇心强"]
+            },
+            "ESFJ": {
+                name: "布偶猫",
+                subtitle: "温柔的抱抱熊",
+                image: "https://cdn2.thecatapi.com/images/bc6.jpg",
+                desc: "你是猫界的大暖男！性格温顺得像一团棉花，最喜欢被抱在怀里。你对主人有着无条件的爱，总是能感知他的情绪并给予安慰。你有着湛蓝的眼睛和柔软的长毛，但最迷人的是你那颗温柔的心。主人说：你是世界上最好的陪伴者。",
+                traits: ["温柔", "粘人", "善解人意", "忠诚", "治愈系"]
+            },
+            "ESFP": {
+                name: "橘猫",
+                subtitle: "快乐的吃货",
+                image: "https://cdn2.thecatapi.com/images/d80.png",
+                desc: "你是家里的开心果！乐观、开朗、爱社交，你的存在就是为了带来欢乐。你对美食有着执着的追求，但这丝毫不影响你的魅力。你喜欢被关注，会主动卖萌求摸摸。有你在的地方就有笑声和喵喵声，是最能活跃气氛的猫。",
+                traits: ["乐观", "爱社交", "吃货", "开朗", "卖萌高手"]
+            },
+            "ENTJ": {
+                name: "暹罗猫",
+                subtitle: "高贵的智者",
+                image: "https://cdn2.thecatapi.com/images/d8n.jpg",
+                desc: "你是猫界的贵族！优雅、聪明、有主见，天生自带高贵气质。你不是在思考，就是在思考的路上。你会观察主人的行为模式，找出最优的「求食策略」。你有着独特的重点色毛发和深邃的蓝眼睛，眼神里总透着智慧。",
+                traits: ["聪明", "优雅", "有主见", "善于沟通", "高贵"]
+            },
+            "ENTP": {
+                name: "阿比西尼亚猫",
+                subtitle: "机灵的小狐狸",
+                image: "https://cdn2.thecatapi.com/images/dkp.jpg",
+                desc: "你是猫界的小机灵鬼！聪明、活跃、创意无限。你总能想出新奇的玩法，开门把手？学会了。偷藏零食？找到了。你享受解决问题带来的成就感，是家里最会「搞事情」的猫。主人永远猜不到你下一步要干什么。",
+                traits: ["聪明", "创意", "活跃", "好奇心强", "问题解决者"]
+            },
+            "ENFJ": {
+                name: "波斯猫",
+                subtitle: "优雅的贵族",
+                image: "https://cdn2.thecatapi.com/images/eb4.jpg",
+                desc: "你是猫界的公主/王子！优雅、高贵、举止端庄，天生自带贵族气质。你关心家里的每一个生命，善于营造和谐的氛围。你有着华丽的长毛和扁平的小脸，虽然看起来高冷，其实内心温暖，是最会照顾人的猫。",
+                traits: ["优雅", "高贵", "温暖", "善解人意", "有魅力"]
+            },
+            "ENFP": {
+                name: "德文卷毛猫",
+                subtitle: "精灵小天使",
+                image: "https://cdn2.thecatapi.com/images/edj.jpg",
+                desc: "你是最特别的猫，没有之一！卷曲的毛发像小精灵，性格更是独特。充满想象力，活在自己的小世界里。你会对着空气发呆（其实是在和看不见的朋友聊天），会在深夜突然跑酷（因为想到了好玩的事）。主人觉得你是来自异次元的小天使。",
+                traits: ["独特", "想象力丰富", "精灵气质", "活泼", "治愈系"]
+            },
+            "ISTJ": {
+                name: "英国短毛猫",
+                subtitle: "稳重的绅士",
+                image: "https://cdn2.thecatapi.com/images/MTkyOTcwNQ.jpg",
+                desc: "你是猫界的模范公民！稳重、可靠、有原则。你有固定的作息时间表，固定的吃饭地点，固定的睡觉位置。你圆圆的脸蛋和敦实的身材让人忍不住想捏，但你总是保持着绅士的风度。主人可以完全信任你——因为你从不惹麻烦。",
+                traits: ["稳重", "可靠", "有原则", "自律", "绅士风度"]
+            },
+            "ISTP": {
+                name: "俄罗斯蓝猫",
+                subtitle: "高冷的酷盖",
+                image: "https://cdn2.thecatapi.com/images/dLrzJVXo1.jpg",
+                desc: "你是猫界的酷盖！冷静、独立、技术流。你不太需要主人的关注，自己就能玩得很开心。你擅长解决实际问题——开柜门、抓虫子、解谜题，这些都是小菜一碟。银蓝色的毛发和翠绿的眼睛让你看起来格外神秘，是最高冷的猫。",
+                traits: ["高冷", "独立", "技术宅", "聪明", "神秘"]
+            },
+            "ISFJ": {
+                name: "苏格兰折耳猫",
+                subtitle: "温柔的小天使",
+                image: "https://cdn2.thecatapi.com/images/15l.jpg",
+                desc: "你是最让人心疼的猫——因为太懂事了！折下来的耳朵让你看起来格外温柔。你从不给主人添麻烦，总是默默付出。你喜欢安静的环境，享受和主人独处的时光。你对主人有着无条件的爱，即使被忽视也不会抱怨。",
+                traits: ["温柔", "懂事", "忠诚", "安静", "默默付出"]
+            },
+            "ISFP": {
+                name: "雪鞋猫",
+                subtitle: "艺术的小精灵",
+                image: "https://cdn2.thecatapi.com/images/8hh.jpg",
+                desc: "你是猫界的艺术家！敏感、细腻、有独特的审美。白色的脚掌像穿着小靴子，优雅又可爱。你喜欢美好的事物——阳光、花香、柔软的毯子。你有着独特的气质，不需要刻意表现就能吸引眼球。你享受当下，是最会享受生活的猫。",
+                traits: ["艺术气质", "敏感", "优雅", "享受生活", "独特"]
+            },
+            "INTJ": {
+                name: "挪威森林猫",
+                subtitle: "深邃的哲学家",
+                image: "https://cdn2.thecatapi.com/images/bc6.jpg",
+                desc: "你是猫界的哲学家！深邃、独立、有洞察力。厚实的毛发让你能适应任何环境，你喜欢独处，在安静中思考宇宙的奥秘（或者如何打开那个该死的柜子）。你不需要太多社交，但当你决定亲近某人时，那份感情是深沉而真挚的。",
+                traits: ["深邃", "独立", "有洞察力", "战略思维", "神秘"]
+            },
+            "INTP": {
+                name: "新加坡猫",
+                subtitle: "聪明的学者",
+                image: "https://cdn2.thecatapi.com/images/d80.png",
+                desc: "你是猫界的学者！好奇、分析、永远在学习。虽然体型小巧，但智商爆表。你对世界充满疑问：为什么激光笔抓不到？为什么水会流动？你享受思考和探索的过程，是最聪明的猫之一。主人常觉得你在用眼神审视他——其实你只是在观察。",
+                traits: ["聪明", "好奇", "分析型", "学者气质", "小巧精悍"]
+            },
+            "INFJ": {
+                name: "土耳其梵猫",
+                subtitle: "灵性的守护者",
+                image: "https://cdn2.thecatapi.com/images/d8n.jpg",
+                desc: "你是最有灵性的猫！直觉敏锐、洞察人心。你似乎能感知主人的情绪变化，在他需要时默默出现。你有着独特的梵猫花纹和深邃的眼神，仿佛藏着整个宇宙。你喜欢安静的环境，享受精神层面的连接，是最懂主人的猫。",
+                traits: ["有灵性", "直觉强", "深沉", "善解人意", "治愈系"]
+            },
+            "INFP": {
+                name: "安哥拉猫",
+                subtitle: "浪漫的诗人",
+                image: "https://cdn2.thecatapi.com/images/dkp.jpg",
+                desc: "你是猫界的诗人！浪漫、敏感、活在自己的小世界里。丝滑的长毛随风飘动，像一位艺术家。你有着柔软的心，容易被触动。你喜欢追逐蝴蝶、凝望星空、在阳光下打盹做白日梦。你不需要太多物质，精神世界的富足才是你的追求。",
+                traits: ["浪漫", "敏感", "梦幻", "温柔", "艺术气质"]
+            }
+        };
+
+        const typeOrder = ["ESTJ", "ESTP", "ESFJ", "ESFP", "ENTJ", "ENTP", "ENFJ", "ENFP", "ISTJ", "ISTP", "ISFJ", "ISFP", "INTJ", "INTP", "INFJ", "INFP"];
+
+        let currentQuestion = 0;
+        let scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+
+        function startTest() {
+            document.getElementById('start-page').classList.remove('active');
+            document.getElementById('question-page').classList.add('active');
+            showQuestion(0);
+        }
+
+        function showQuestion(index) {
+            const question = questions[index];
+            document.getElementById('question-num').textContent = `问题 ${index + 1}/${questions.length}`;
+            document.getElementById('progress').style.width = `${((index + 1) / questions.length) * 100}%`;
+            document.getElementById('question-text').textContent = question.text;
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            question.options.forEach((option, i) => {
+                const btn = document.createElement('div');
+                btn.className = 'option';
+                btn.textContent = option.text;
+                btn.onclick = () => selectOption(i, option.scores);
+                optionsDiv.appendChild(btn);
+            });
+        }
+
+        function selectOption(optionIndex, optionScores) {
+            for (const [dimension, score] of Object.entries(optionScores)) {
+                scores[dimension] += score;
+            }
+            
+            const options = document.querySelectorAll('.option');
+            options[optionIndex].classList.add('selected');
+            
+            setTimeout(() => {
+                currentQuestion++;
+                if (currentQuestion < questions.length) {
+                    showQuestion(currentQuestion);
+                } else {
+                    showResult();
+                }
+            }, 300);
+        }
+
+        function showResult() {
+            document.getElementById('question-page').classList.remove('active');
+            document.getElementById('result-page').classList.add('active');
+            
+            const type = 
+                (scores.E >= scores.I ? 'E' : 'I') +
+                (scores.S >= scores.N ? 'S' : 'N') +
+                (scores.T >= scores.F ? 'T' : 'F') +
+                (scores.J >= scores.P ? 'J' : 'P');
+            
+            const result = results[type];
+            
+            document.getElementById('result-image').src = result.image;
+            document.getElementById('result-name').textContent = result.name;
+            document.getElementById('result-subtitle').textContent = result.subtitle;
+            document.getElementById('result-desc').textContent = result.desc;
+            
+            const traitsDiv = document.getElementById('traits');
+            traitsDiv.innerHTML = '';
+            result.traits.forEach(trait => {
+                const span = document.createElement('span');
+                span.className = 'trait';
+                span.textContent = trait;
+                traitsDiv.appendChild(span);
+            });
+            
+            const dimensionsDiv = document.getElementById('dimension-scores');
+            dimensionsDiv.innerHTML = `
+                <div class="dimension">
+                    <div class="dimension-label">能量来源</div>
+                    <div class="dimension-value">${scores.E >= scores.I ? 'E 外向' : 'I 内向'} (${Math.max(scores.E, scores.I)})</div>
+                </div>
+                <div class="dimension">
+                    <div class="dimension-label">认知方式</div>
+                    <div class="dimension-value">${scores.S >= scores.N ? 'S 感觉' : 'N 直觉'} (${Math.max(scores.S, scores.N)})</div>
+                </div>
+                <div class="dimension">
+                    <div class="dimension-label">决策方式</div>
+                    <div class="dimension-value">${scores.T >= scores.F ? 'T 思考' : 'F 情感'} (${Math.max(scores.T, scores.F)})</div>
+                </div>
+                <div class="dimension">
+                    <div class="dimension-label">生活态度</div>
+                    <div class="dimension-value">${scores.J >= scores.P ? 'J 判断' : 'P 知觉'} (${Math.max(scores.J, scores.P)})</div>
+                </div>
+            `;
+            
+            renderAllTypes(type);
+        }
+        
+        function renderAllTypes(userType) {
+            const grid = document.getElementById('all-types-grid');
+            grid.innerHTML = '';
+            
+            typeOrder.forEach(typeCode => {
+                const r = results[typeCode];
+                const isUser = typeCode === userType;
+                
+                const card = document.createElement('div');
+                card.className = 'type-card' + (isUser ? ' is-user' : '');
+                card.innerHTML = `
+                    <img class="type-card-image" src="${r.image}" alt="${r.name}">
+                    <div class="type-card-content">
+                        <div class="type-card-header">
+                            <span class="type-card-name">${r.name}${isUser ? '<span class="your-result-badge">你的结果</span>' : ''}</span>
+                        </div>
+                        <div class="type-card-subtitle">${r.subtitle}</div>
+                        <div class="type-card-desc">${r.desc}</div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function restart() {
+            currentQuestion = 0;
+            scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            document.getElementById('result-page').classList.remove('active');
+            document.getElementById('start-page').classList.add('active');
+        }
+    </script>
+</body>
+</html>
