@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CATTI — 猫格人格测试 🐱</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB',sans-serif;
+  background:#fef7f0;
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  color:#333;
+  overflow-x:hidden;
+}
+.container{
+  width:100%;max-width:480px;min-height:100vh;padding:20px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+
+/* ===== Start Page ===== */
+.start-page{text-align:center}
+.start-page .logo{font-size:72px;margin-bottom:8px}
+.start-page h1{font-size:36px;font-weight:800;color:#2d1b0e;margin-bottom:4px;letter-spacing:-1px}
+.start-page .subtitle{color:#a67c52;font-size:15px;margin-bottom:32px;font-weight:500}
+.start-page .desc{color:#888;font-size:14px;line-height:1.8;margin-bottom:40px;text-align:left;background:#fff9f3;border-radius:16px;padding:24px 28px;border:1px solid #f0ddd0}
+.start-btn{
+  display:inline-block;padding:18px 56px;font-size:18px;font-weight:700;
+  color:#fff;background:linear-gradient(135deg,#ff8c5a,#e86a3a);
+  border:none;border-radius:50px;cursor:pointer;
+  transition:all .3s ease;box-shadow:0 6px 24px rgba(232,106,58,.35);
+  letter-spacing:2px;
+}
+.start-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(232,106,58,.45)}
+.start-footer{margin-top:48px;color:#bbb;font-size:12px}
+
+/* ===== Quiz Page ===== */
+.quiz-page{width:100%}
+.progress-bar{display:flex;gap:6px;margin-bottom:32px;justify-content:center}
+.progress-dot{width:10px;height:10px;border-radius:50%;background:#f0ddd0;transition:.3s}
+.progress-dot.active{background:#e86a3a;width:28px;border-radius:5px}
+.progress-dot.done{background:#ffc099}
+.q-num{font-size:13px;color:#bbb;text-align:center;margin-bottom:16px;font-weight:600;letter-spacing:2px}
+.q-text{font-size:19px;color:#2d1b0e;line-height:1.7;text-align:center;margin-bottom:36px;font-weight:700;min-height:80px;display:flex;align-items:center;justify-content:center;padding:0 8px}
+.options{display:flex;flex-direction:column;gap:14px}
+.option-btn{
+  padding:18px 22px;border:2px solid #f0ddd0;border-radius:16px;
+  background:#fff;font-size:15px;color:#555;cursor:pointer;
+  transition:all .25s ease;text-align:left;position:relative;
+  font-weight:500;line-height:1.5;
+}
+.option-btn:hover{border-color:#ffb088;background:#fffaf7;transform:translateX(4px)}
+.option-btn.selected{border-color:#e86a3a;background:#fff5ef;color:#c44d22}
+.option-label{display:inline-block;width:30px;height:30px;line-height:30px;text-align:center;
+  border-radius:50%;background:#f5ebe0;color:#a67c52;font-weight:800;font-size:13px;margin-right:12px;flex-shrink:0}
+.option-btn.selected .option-label{background:#e86a3a;color:#fff}
+.option-text{display:inline-flex;align-items:center}
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:32px;padding-top:16px}
+.nav-btn{
+  padding:12px 28px;border:none;border-radius:50px;cursor:pointer;
+  font-size:14px;font-weight:700;transition:all .3s;
+}
+.nav-prev{background:none;color:#bbb;border:2px solid #eee}
+.nav-next{padding:14px 36px;color:#fff;background:linear-gradient(135deg,#ff8c5a,#e86a3a);box-shadow:0 4px 16px rgba(232,106,58,.3)}
+.nav-next:hover{transform:translateY(-1px)}
+.nav-next:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* ===== Result Page ===== */
+.result-page{text-align:center}
+.result-emoji{font-size:80px;margin-bottom:12px;animation:bounceIn .8s ease}
+@keyframes bounceIn{0%{transform:scale(0);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.result-type{font-size:42px;font-weight:900;color:#2d1b0e;margin-bottom:4px;letter-spacing:2px}
+.result-name{font-size:26px;font-weight:800;color:#e86a3a;margin-bottom:8px}
+.result-slogan{color:#a67c52;font-size:15px;margin-bottom:28px;font-style:italic}
+.result-desc{color:#666;font-size:14px;line-height:2;text-align:left;background:#fff9f3;border-radius:16px;padding:24px 28px;margin-bottom:28px;border:1px solid #f0ddd0}
+.tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:36px}
+.tag{padding:8px 18px;border-radius:20px;font-size:13px;font-weight:600;background:#fff5ef;color:#c47d4d;border:1px solid #f0ddd0}
+.dimension-bars{width:100%;text-align:left;background:#fff;border-radius:16px;padding:24px 28px;margin-bottom:32px;border:1px solid #f0ddd0}
+.dbar{margin-bottom:18px}
+.dbar:last-child{margin-bottom:0}
+.dbar-label{display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:#888;margin-bottom:6px}
+.dbar-track{height:8px;background:#f5ebe0;border-radius:4px;overflow:hidden;position:relative}
+.dbar-fill{height:100%;border-radius:4px;transition:width 1s ease}
+.dbar-fill.left{background:linear-gradient(90deg,#ffd6c4,#ffb088);float:left}
+.dbar-fill.right{background:linear-gradient(90deg,#e86a3a,#c44d22);float:right}
+.result-actions{display:flex;gap:14px;justify-content:center}
+.action-btn{
+  padding:14px 32px;border:none;border-radius:50px;cursor:pointer;
+  font-size:15px;font-weight:700;transition:all .3s;
+}
+.action-primary{color:#fff;background:linear-gradient(135deg,#ff8c5a,#e86a3a);box-shadow:0 4px 16px rgba(232,106,58,.3)}
+.action-secondary{color:#999;background:#f5ebe0;border:2px solid #f0ddd0}
+.action-btn:hover{transform:translateY(-2px)}
+
+/* ===== Animations ===== */
+.fade-in{animation:fadeIn .45s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.slide-in{animation:slideIn .4s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+
+/* ===== Responsive ===== */
+@media(max-width:400px){
+  .container{padding:16px}
+  .start-page h1{font-size:28px}
+  .q-text{font-size:17px}
+  .option-btn{padding:14px 18px;font-size:14px}
+  .result-type{font-size:34px}
+}
+</style>
+</head>
+<body>
+
+<div class="container" id="app"></div>
+
+<script>
+// ========== CATTI 数据定义 ==========
+
+// 四个维度：E/I → 能量来源 | N/S → 行为方式 | T/F → 性格倾向 | J/P → 生活态度
+const DIMENSIONS = [
+  { left: 'I', right: 'E', leftName: '独处型', rightName: '社交型' },
+  { left: 'S', right: 'N', leftName: '享受派', rightName: '捕猎者' },
+  { left: 'T', right: 'F', leftName: '高冷型', rightName: '亲昵型' },
+  { left: 'P', right: 'J', leftName: '随性派', rightName: '规律型' }
+];
+
+// 16种猫格类型定义
+const TYPES = {
+  'ISTJ': { emoji:'🐈‍⬛', name:'守门猫', slogan:'「我看过你进门，也看过你离开」', desc:'你是那种会在门口端坐一整天的猫咪。作息精确到秒，对环境变化高度敏感。铲屎官晚归三分钟？你已经在大门口等好了。你的领地意识极强，任何陌生人都别想轻易踏进你的地盘。虽然看起来高冷，但你是家里最可靠的存在——有你在，这个家就安全了。', tags:['严谨','忠诚','守时','警觉'] },
+  'ISFJ': { emoji:'🧶', name:'贴心猫', slogan:'「我不说话，但我都在」', desc:'你是那个在铲屎官难过时默默靠过来的小天使。不善言辞却心思细腻，总能察觉到主人的情绪变化。你喜欢安静地待在同一个房间，不需要太多关注，只要偶尔摸摸头就够了。你对家人极度忠诚，是那种会用自己的体温温暖冰冷脚边的存在。', tags:['温柔','体贴','观察力强','居家'] },
+  'INFJ': { emoji:'🌙', name:'哲学猫', slogan:'「你们不懂，我在思考宇宙」', desc:'你是猫界的思想家，经常独自坐在窗边凝视远方。表面安静如水，内心世界却波澜壮阔。你能读懂人类的情绪，甚至比他们自己还懂。你有着神秘的魅力，让人忍不住想靠近却又不敢打扰。你不是不合群，只是大多数时候，你更享受与自己对话。', tags:['深沉','直觉敏锐','神秘','理想主义'] },
+  'INTJ': { emoji:'🎩', name:'战略猫', slogan:'「一切尽在掌握之中」', desc:'你是家里智商最高的存在，而且你知道这一点。你善于制定计划——什么时候叫醒铲屎官、怎么用最小的力气打开柜门、如何让全家都围着你转。你看透了人类的一切把戏，选择配合只是因为这样对你更有利。高傲但不无理，冷漠但精准。', tags:['聪明','掌控欲强','独立思考','高效'] },
+  'ISTP': { emoji:'🎒', name:'探险猫', slogan:「'我去去就回（大概）'」, desc:'你是天生的冒险家，好奇心能杀死九条命的那种。家里的每个角落都被你翻了个遍，窗外的鸟比猫粮更有吸引力。你不爱被束缚，喜欢自己探索新事物。拆过三个沙发、打碎五个杯子——但你从不后悔，因为每一次都是新的发现。', tags:['好奇','动手能力强','冷静勇敢','不按套路出牌'] },
+  'ISFP': { emoji:'🎨', name:'文艺猫', slogan:'「美，是一种姿态」', desc:'你是猫中的艺术家，连睡觉的姿势都像一幅画。你对美有着天然的敏感度——阳光洒在地板的角度、窗帘随风飘动的弧度，都能让你驻足欣赏。你不喜欢冲突，更喜欢用优雅的方式表达自我。你不需要太多观众，因为你自己就是最好的作品。', tags:['审美在线','优雅','感性','追求美好'] },
+  'INFP': { emoji:'☁️', name:'梦想猫', slogan:'「总有一天，我会飞起来」', desc:'你是浪漫主义的化身，相信每只猫都有属于自己的使命。你花大量时间发呆、幻想，构建着内心那个完美的世界。你情感丰富且真诚，容易被触动，也容易受伤。你可能不是最显眼的那只猫，但在爱你的人眼中，你就是全世界最特别的存在。', tags:['浪漫','富有同理心','想象力丰富','温柔坚定'] },
+  'INTP': { emoji:'🔬', name:'发明猫', slogan:'「有趣……让我研究一下」', desc:'你是猫界的小科学家，对万事万物都充满疑问。为什么水龙头的水比碗里的好喝？为什么吸尘器这么吵？你会花一下午时间观察一只苍蝇的运动轨迹，然后试图总结出规律。你的大脑永远在运转，别人觉得你呆萌，其实你只是在思考更深层次的问题。', tags:['逻辑强','创新','分析癖','脑洞大'] },
+  'ESTP': { emoji:'⚡', name:'运动猫', slogan:'「冲就完了！」', desc:'你是精力无限的活力担当！凌晨三点跑酷是你的日常，沙发是你的蹦床，窗帘是你的攀岩壁。你热爱刺激和挑战，没有你不敢尝试的事情。反应速度极快，抓蚊子从未失手。你是派对的核心人物，只要有你在，永远不会无聊。', tags:['行动力爆表','大胆','竞技精神','乐天派'] },
+  'ESFP': { emoji:'🎤', name:'表演猫', slogan:'「看我！快看我！」', desc:'舞台中央永远有你的位置。你热爱成为焦点，会用各种方式吸引注意力——从突然的空中翻转到震耳欲聋的喵喵叫。你热情洋溢、情绪外放，和谁都能打成一片。生活对你来说就是一场永不落幕的演出，而你是永远的C位主角。', tags:['表现欲强','社交达人','乐观开朗','感染力强'] },
+  'ENFJ': { emoji:'👑', name:'领袖猫', slogan:'「跟着我就对了」', desc:'你天生具有感召力，其他猫咪都会不由自主地跟随你。你善于协调关系，当两只猫打架时，你是那个出面调解的和事佬。你关心每一个成员，记得每个人的喜好。你不是靠强势来领导，而是用温暖和智慧让大家信服。真正的猫格魅力担当！', tags:['有领导力','善于沟通','温暖','凝聚力强'] },
+  'ENTJ': { emoji:'💼', name:'CEO猫', slogan:'「这家我说了算」', desc:'你是家里的绝对话事人，所有资源分配由你决定。哪个猫窝归谁、什么时候开饭、谁能上沙发——这些都是你要管理的"业务"。你决策果断、执行力强，不允许低效和无序存在。在你眼里，这个家就是一个公司，而你，是CEO。', tags:['决断力强','目标导向','组织能力','霸气'] },
+  'ESTJ': { emoji:'📋', name:'管家猫', slogan:'「请遵守家规第38条」', desc:'你是家庭秩序的维护者，对规则有着近乎执念的坚持。吃饭时间固定、睡觉位置固定、甚至连晒太阳的角度都不能变。你会主动纠正其他猫咪的不规范行为，虽然有时显得有点啰嗦，但没有你，这个家早就乱套了。靠谱到让人心疼。', tags:['负责任','有条理','原则性强','靠谱'] },
+  'ESFJ': { emoji:'🏠', name:'主人猫', slogan:'「来都来了，喝杯水再走」', desc:'你是最好客的那只猫！来了客人第一个凑上去蹭的是你，邻居来串门也要打招呼的还是你。你热衷于照顾每一个人，确保大家都吃好睡好玩好。你害怕孤独，需要感受到自己是群体的一部分。有你在的地方，就有家的温度。', tags:['热情好客','社交活跃','照顾他人','合群'] },
+  'ENFP': { emoji:'🎉', name:'快乐猫', slogan：「'今天也要元气满满喵！'」, desc:'你是行走的正能量发射器，走到哪里就把快乐带到哪里。一个纸团也能让你兴奋半小时，看到蝴蝶能开心一整天。你思维跳跃，上一秒在追尾巴下一秒就开始思考人生。你的热情具有传染力，和你在一起的人都会不自觉地嘴角上扬。', tags:['充满活力','创意无限','热情洋溢','善变但可爱'] },
+  'ENTP': { emoji:'😼', name:'捣蛋猫', slogan:'「我只是想看看会发生什么」', desc:'你是猫界的恶作剧之神。把水杯推下桌子不是为了喝水，而是为了听那个响声。假装伸懒腰其实是为了偷袭路过的人类。你的大脑永远在想"如果这样做会怎样"，然后毫不犹豫地去执行。聪明、机灵、让人又爱又恨——这就是你。', tags:['机智','恶作剧','反传统','辩论高手'] }
+};
+
+// 10道测试题目 [维度索引, 左选项得分, 右选项得分]
+const QUESTIONS = [
+  {
+    text: '周末的早晨，阳光正好照进窗户，你最想做的是？',
+    options: [
+      { label: 'A', text: '蜷缩在阳光下舒舒服服地睡个回笼觉 😴', scores: [1,0,0,0] },
+      { label: 'B', text: '满屋子跑酷，顺便把铲屎官踩醒让他陪玩 🏃' , scores: [0,1,0,0] }
+    ]
+  },
+  {
+    text: '铲屎官给你买了一个超豪华的新猫窝，你的第一反应是？',
+    options: [
+      { label: 'A', text: '闻了闻，确认安全后安心躺进去 💤', scores: [0,1,0,0] },
+      { label: 'B', text: '完全无视，反而盯上了装猫窝的纸箱子 📦', scores: [0,0,1,0] }
+    ]
+  },
+  {
+    text: '铲屎官下班回家一脸疲惫地瘫在沙发上，你会？',
+    options: [
+      { label: 'A', text: '默默走过去，把头靠在他的腿上 🥺', scores: [0,0,0,1] },
+      { label: 'B', text: '坐在旁边静静看着他，保持优雅距离 ✨', scores: [0,0,1,0] }
+    ]
+  },
+  {
+    text: '关于每天吃饭这件事，你的态度是？',
+    options: [
+      { label: 'A', text: '固定时间固定位置，差一分钟都不行 ⏰', scores: [0,0,0,1] },
+      { label: 'B', text: '饿了就吃，困了就睡，随心所欲~ 🌿', scores: [0,0,0,0] } // P得分
+    ]
+  },
+  {
+    text: '窗外飞过一只小鸟，你的反应是？',
+    options: [
+      { label: 'A', text: '发出咔咔咔的声音，疯狂拍打玻璃 🐦', scores: [0,1,0,0] },
+      { label: 'B', text: '慵懒地抬眼看一下，继续晒太阳 ☀️', scores: [0,0,1,0] }
+    ]
+  },
+  {
+    text: '家里来了陌生人，你的应对策略是？',
+    options: [
+      { label: 'A', text: '躲在沙发底下暗中观察 👀', scores: [1,0,0,0] },
+      { label: 'B', text: '直接走过去蹭人家腿求撸 🐱', scores: [0,1,0,0] }
+    ]
+  },
+  {
+    text: '铲屎官想抱你，你的典型反应是？',
+    options: [
+      { label: 'A', text: '勉强配合三秒钟，然后挣脱逃跑 🏃‍♂️', scores: [0,0,1,0] },
+      { label: 'B', text: '舒服地眯起眼睛，发出呼噜声 😻', scores: [0,0,0,1] }
+    ]
+  },
+  {
+    text: '半夜三点，你突然精力充沛，你会？',
+    options: [
+      { label: 'A', text: '在铲屎官脸上来回奔跑，叫他起来陪我玩 🏃', scores: [0,1,0,0] },
+      { label: 'B', text: '安静地自己在房间里探索冒险 🔍', scores: [1,0,0,0] }
+    ]
+  },
+  {
+    text: '对于"被洗澡"这件事，你觉得？',
+    options: [
+      { label: 'A', text: '坚决反抗！这是对猫格的侮辱！！🛡️', scores: [0,0,1,0] },
+      { label: 'B', text: '虽然不喜欢，但乖乖配合让铲屎官快点搞定 🛁', scores: [0,0,0,1] }
+    ]
+  },
+  {
+    text: '如果让你用一句话描述自己的猫生哲学，会是？',
+    options: [
+      { label: 'A', text: '「认真规划每一天，做一只有纪律的猫」📝', scores: [0,0,0,1] },
+      { label: 'B', text: '「活在当下，意外才是生活的调味剂」🎲', scores: [0,0,0,0] } // P得分
+    ]
+  }
+];
+
+// ========== 状态管理 ==========
+let currentQuestion = 0;
+let answers = []; // 存储每题选择的scores数组
+let page = 'start'; // start | quiz | result
+
+// ========== 渲染函数 ==========
+const app = document.getElementById('app');
+
+function renderStart() {
+  app.innerHTML = `
+    <div class="start-page fade-in">
+      <div class="logo">🐱</div>
+      <h1>CATTI</h1>
+      <div class="subtitle">Cat Type Indicator · 猫格人格测试</div>
+      <div class="desc">
+        🐾 <b>想知道你家主子是什么类型的猫吗？<br>或者说……你是一只什么猫？</b><br><br>
+        本测试基于 MBTI 理论改编，通过 10 道精心设计的猫咪情境题目，帮你找到专属的<strong>猫格类型</strong>。<br><br>
+        共有 <b>16 种猫格</b>等你发现，每种都有独特的性格画像~
+      </div>
+      <button class="start-btn" onclick="startQuiz()">开始测试 🐾</button>
+      <div class="start-footer">灵感来自 DOGTI · Made with ❤️ for cats everywhere</div>
+    </div>`;
+}
+
+function renderQuiz() {
+  const q = QUESTIONS[currentQuestion];
+  const selected = answers[currentQuestion];
+  
+  let dotsHtml = '';
+  for(let i=0;i<QUESTIONS.length;i++){
+    let cls = 'progress-dot';
+    if(i===currentQuestion) cls+=' active';
+    else if(i<currentQuestion || answers[i]!==undefined) cls+=' done';
+    dotsHtml+=`<div class="${cls}"></div>`;
+  }
+
+  let optsHtml = '';
+  q.options.forEach((opt, idx) => {
+    const sel = selected === idx ? 'selected' : '';
+    optsHtml += `
+      <button class="option-btn ${sel}" onclick="selectOption(${idx})">
+        <span class="option-text"><span class="option-label">${opt.label}</span>${opt.text}</span>
+      </button>`;
+  });
+
+  const canNext = selected !== undefined;
+
+  app.innerHTML = `
+    <div class="quiz-page fade-in">
+      <div class="progress-bar">${dotsHtml}</div>
+      <div class="q-num">Q${currentQuestion+1} / ${QUESTIONS.length}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="options">${optsHtml}</div>
+      <div class="nav-row">
+        ${currentQuestion > 0 ? `<button class="nav-btn nav-prev" onclick="prevQuestion()">← 上一题</button>` : '<span></span>'}
+        <button class="nav-btn nav-next" onclick="nextQuestion()" ${canNext ? '' : 'disabled'}>${currentQuestion === QUESTIONS.length-1 ? '查看结果 🎉' : '继续 →'}</button>
+      </div>
+    </div>`;
+}
+
+function renderResult() {
+  // 计算各维度分数
+  const scores = [0,0,0,0]; // E, N, F, J 的总分
+  answers.forEach(a => {
+    if(a){
+      for(let i=0;i<4;i++) scores[i] += a[i];
+    }
+  });
+
+  // 判断每个维度的倾向
+  let typeStr = '';
+  const dimResults = [];
+  // Q1: I/E → index 0, A=I(left), B=E(right)
+  typeStr += scores[0]>=5 ? 'E' : 'I';
+  dimResults.push({
+    left: DIMENSIONS[0].leftName, right: DIMENSIONS[0].rightName,
+    leftVal: 10-scores[0], rightVal: scores[0]
+  });
+  // Q2: S/N → index 1, A=S(left), B=N(right)
+  typeStr += scores[1]>=5 ? 'N' : 'S';
+  dimResults.push({
+    left: DIMENSIONS[1].leftName, right: DIMENSIONS[1].rightName,
+    leftVal: 10-scores[1], rightVal: scores[1]
+  });
+  // Q3: T/F → index 2, A=T(left), B=F(right)
+  typeStr += scores[2]>=5 ? 'F' : 'T';
+  dimResults.push({
+    left: DIMENSIONS[2].leftName, right: DIMENSIONS[2].rightName,
+    leftVal: 10-scores[2], rightVal: scores[2]
+  });
+  // Q4: P/J → index 3, A=J(right), B=P(left)
+  typeStr += scores[3]>=5 ? 'J' : 'P';
+  dimResults.push({
+    left: DIMENSIONS[3].leftName, right: DIMENSIONS[3].rightName,
+    leftVal: 10-scores[3], rightVal: scores[3]
+  });
+
+  const t = TYPES[typeStr];
+
+  let barsHtml = '';
+  dimResults.forEach((d,i) => {
+    barsHtml+=`
+      <div class="dbar">
+        <div class="dbar-label"><span>${d.left}</span><span>${d.right}</span></div>
+        <div class="dbar-track">
+          <div class="dbar-fill left" style="width:${d.leftVal*10}%"></div>
+          <div class="dbar-fill right" style="width:${d.rightVal*10}%"></div>
+        </div>
+      </div>`;
+  });
+
+  let tagsHtml = t.tags.map(tag=>`<span class="tag">#${tag}</span>`).join('');
+
+  app.innerHTML = `
+    <div class="result-page fade-in">
+      <div class="result-emoji">${t.emoji}</div>
+      <div class="result-type">${typeStr}</div>
+      <div class="result-name">${t.name}</div>
+      <div class="result-slogan">${t.slogan}</div>
+      <div class="result-desc">${t.desc}</div>
+      <div class="tags">${tagsHtml}</div>
+      <div class="dimension-bars">${barsHtml}</div>
+      <div class="result-actions">
+        <button class="action-btn action-secondary" onclick="restartQuiz()">再测一次 🔄</button>
+        <button class="action-btn action-primary" onclick="shareResult()">分享给朋友 📤</button>
+      </div>
+    </div>`;
+}
+
+// ========== 交互逻辑 ==========
+function startQuiz(){
+  page='quiz';currentQuestion=0;answers=[];
+  renderQuiz();
+}
+
+function selectOption(idx){
+  answers[currentQuestion]=idx;
+  // 更新按钮状态
+  const btns=document.querySelectorAll('.option-btn');
+  btns.forEach((b,i)=>b.classList.toggle('selected',i===idx));
+  // 启用下一步
+  const nextBtn=document.querySelector('.nav-next');
+  if(nextBtn){nextBtn.disabled=false;}
+}
+
+function nextQuestion(){
+  if(currentQuestion < QUESTIONS.length-1){
+    currentQuestion++;
+    renderQuiz();
+  } else {
+    page='result';
+    renderResult();
+  }
+}
+
+function prevQuestion(){
+  if(currentQuestion > 0){
+    currentQuestion--;
+    renderQuiz();
+  }
+}
+
+function restartQuiz(){
+  page='start';
+  renderStart();
+}
+
+function shareResult(){
+  const typeEl=document.querySelector('.result-type');
+  const nameEl=document.querySelector('.result-name');
+  if(typeEl&&nameEl){
+    const text=`🐱 我的猫格是 ${typeEl.textContent} —— ${nameEl.textContent}！来测测你是什么猫吧~`;
+    if(navigator.share){
+      navigator.share({title:'CATTI 猫格人格测试',text:text,url:location.href}).catch(()=>{});
+    }else{
+      navigator.clipboard.writeText(text+' '+location.href).then(()=>{
+        alert('已复制到剪贴板，快去粘贴分享吧！📋');
+      }).catch(()=>{
+        prompt('复制以下内容分享给朋友：',text+' '+location.href);
+      });
+    }
+  }
+}
+
+// ========== 初始化 ==========
+renderStart();
+</script>
+</body>
+</html>
